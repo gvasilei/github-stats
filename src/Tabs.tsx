@@ -2,7 +2,7 @@ import * as React from 'react';
 import { GET_PULL_REQUESTS } from './queries';
 import * as moment from "moment";
 import PullRequestList from './PullRequestList';
-import { Grid, Loader, Card, Image, Header, Message, Menu, Icon, Dropdown } from 'semantic-ui-react';
+import { Grid, Loader, Card, Image, Message, Menu, Icon, Dropdown, Statistic } from 'semantic-ui-react';
 import { Query } from "react-apollo";
 import { getPRs_repository_pullRequests_nodes as PullRequest, getPRs as Repository } from './__generated__/getPRs';
 import AddRepo from './AddRepo';
@@ -106,8 +106,8 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
           <Grid divided='vertically'>
             <Grid.Row columns={1}>
               <Grid.Column textAlign="center">
-              <br />
-              <Header as='h4'>{`Total PRs: ${pullRequests.length}`}</Header>
+                <br />
+                <Statistic size='small' label='Open Pull Requests' value={pullRequests.length} />
               </Grid.Column>
             </Grid.Row>
             {users.length > 0 &&
@@ -119,11 +119,11 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
             }
             <Grid.Row columns={2}>
               <Grid.Column>
-                <Header as='h4'>{`Late PRs: ${latePRs.length}`}</Header>
+                <Statistic size='small' label='Late Pull Requests' value={latePRs.length} />
                 <PullRequestList pullRequests={latePRs} />
               </Grid.Column>
               <Grid.Column>
-                <Header as='h4'>{`Pull Requests up for grabs: ${unassignedPRs.length}`}</Header>
+                <Statistic size='small' label='Pull Requests up for grabs' value={unassignedPRs.length} />
                 <PullRequestList pullRequests={unassignedPRs} />
               </Grid.Column>
             </Grid.Row>
@@ -199,6 +199,6 @@ function getPRPerUser(pullRequests: PullRequest[]) {
 // Can't be bothered to pass the state change all the way to the top component
 // to rerender the tabs, so for now I'm refreshing the page which is good enough for me tbh
 panes.push({
-    menuItem : <Menu.Item icon='plus' />,
+    menuItem : <Menu.Item icon='plus' title='Add a new repo' />,
     render : () => <AddRepo />
 });

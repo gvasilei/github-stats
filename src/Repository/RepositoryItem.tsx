@@ -131,6 +131,8 @@ const RepositoryItem = ({
       </Mutation> 
       ) 
       }
+      <br/>
+      <br/>
       {viewerSubscription === null || viewerSubscription !== SubscriptionState.SUBSCRIBED ? (
         <Mutation mutation={UPDATE_SUBSCRIPTION} variables={{id: id, state: SubscriptionState.SUBSCRIBED}} update={handleUpdateSubscription}>
           {(updateSubscriptionFn, { data, loading, error}) => (
@@ -156,6 +158,8 @@ const RepositoryItem = ({
           )}
         </Mutation>
       )}
+      <br/>
+      <br/>
       <Button content='Add to Stats' icon='plus' labelPosition='left' value={`${owner.login},${name}`} onClick={addToStats}/>
 
     </Card.Content>
