@@ -29,8 +29,8 @@ const Profile = () => (
 
       return (
         <div>
-          {viewer.name} - {viewer.login}
           <Menu vertical fluid borderless compact>
+            <Menu.Item header>My Repositories - {viewer.name}</Menu.Item>
             <RepositoryList repositories={viewer.repositories} fetchMore={fetchMore} />
           </Menu>
         </div>
