@@ -33,6 +33,7 @@ export const GET_PULL_REQUESTS = gql`
       name
       pullRequests(states: [OPEN], first: 100) {
         nodes {
+          id
           title
           createdAt
           url

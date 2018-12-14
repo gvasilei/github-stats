@@ -94,6 +94,7 @@ export interface getPRs_repository_pullRequests_nodes_reviews {
 
 export interface getPRs_repository_pullRequests_nodes {
   __typename: "PullRequest";
+  id: string;
   /**
    * Identifies the pull request title.
    */

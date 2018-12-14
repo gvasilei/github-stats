@@ -2,7 +2,7 @@ import * as React from 'react';
 import { GET_PULL_REQUESTS } from './queries';
 import * as moment from "moment";
 import PullRequestList from './PullRequestList';
-import { Grid, Loader, Card, Image, Header, Message, Menu, Icon } from 'semantic-ui-react';
+import { Grid, Loader, Card, Image, Header, Message, Menu, Icon, Dropdown } from 'semantic-ui-react';
 import { Query } from "react-apollo";
 import { getPRs_repository_pullRequests_nodes as PullRequest, getPRs as Repository } from './__generated__/getPRs';
 import AddRepo from './AddRepo';
@@ -90,7 +90,13 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
               <Card.Content>
                 <Image floated='right' size='mini' src={prPerUser[key].avatarUrl}/>
                 <Card.Header>{prPerUser[key].name}</Card.Header>
-                <Card.Description>{prPerUser[key].pullRequests.length} Pull Request(s)</Card.Description>
+                <Card.Description>
+                  <Dropdown text={`${prPerUser[key].pullRequests.length} Pull Request(s)`}>
+                    <Dropdown.Menu>
+                      {prPerUser[key].pullRequests.map((pr: PullRequest) => <Dropdown.Item as="a" target="_blank" key={pr.id} text={pr.title} href={pr.url} />)}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Card.Description>
               </Card.Content>
             </Card>
             );
