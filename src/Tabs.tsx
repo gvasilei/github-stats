@@ -1,13 +1,23 @@
 import * as React from 'react';
-import { GET_PULL_REQUESTS } from './queries';
 import * as moment from "moment";
+import { Grid, Loader, Card, Message, Menu, Icon, Statistic } from 'semantic-ui-react';
+
+import { GET_PULL_REQUESTS } from './queries';
+
+import UserStats from './UserStats';
 import PullRequestList from './PullRequestList';
-import { Grid, Loader, Card, Image, Message, Menu, Icon, Dropdown, Statistic } from 'semantic-ui-react';
 import { Query } from "react-apollo";
 import { getPRs_repository_pullRequests_nodes as PullRequest, getPRs as Repository } from './__generated__/getPRs';
 import AddRepo from './AddRepo';
 import isNotNull from './Utils';
 
+export type PullRequestsPerUser = {
+  [key: string]: {
+    name: string,
+    avatarUrl: string,
+    pullRequests: Array<PullRequest>
+  }
+};
 
 // TODO - Create DTOs to handle serialization / desereliazation. Can't be bothered now.
 class RepoQueryVariables {
@@ -36,13 +46,7 @@ const getRepoQueryVariables = (): RepoQueryVariables[] => {
 
 const repos = getRepoQueryVariables();
 
-type prGroups = {
-  [key: string]: {
-    name: string,
-    avatarUrl: string,
-    pullRequests: Array<PullRequest>
-  }
-};
+
 
 class RepoQuery extends Query<Repository, {}> {}
 
@@ -83,24 +87,6 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
           const latePRs = getLatePRs(pullRequests);
           const unassignedPRs = getUnassignedPRs(pullRequests);
           const prPerUser = getPRPerUser(pullRequests);
-
-          const users = Object.keys(prPerUser).map((key: string) => {
-            return (
-              <Card key={`card-${key}`}>
-              <Card.Content>
-                <Image floated='right' size='mini' src={prPerUser[key].avatarUrl}/>
-                <Card.Header>{prPerUser[key].name}</Card.Header>
-                <Card.Description>
-                  <Dropdown text={`${prPerUser[key].pullRequests.length} Pull Request(s)`}>
-                    <Dropdown.Menu>
-                      {prPerUser[key].pullRequests.map((pr: PullRequest) => <Dropdown.Item as="a" target="_blank" key={pr.id} text={pr.title} href={pr.url} />)}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </Card.Description>
-              </Card.Content>
-            </Card>
-            );
-          });
   
           return (
           <Grid divided='vertically'>
@@ -110,11 +96,11 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
                 <Statistic size='small' label='Open Pull Requests' value={pullRequests.length} />
               </Grid.Column>
             </Grid.Row>
-            {users.length > 0 &&
+            {Object.keys(prPerUser).length > 0 &&
             <Grid.Row>
-            <Card.Group>
-            {users}
-            </Card.Group>
+              <Card.Group>
+                <UserStats prPerUser={prPerUser} />
+              </Card.Group>
             </Grid.Row>
             }
             <Grid.Row columns={2}>
@@ -136,21 +122,32 @@ export let panes = repos.map((repo: RepoQueryVariables) => {
   };
 });
 
+// Can't be bothered to pass the state change all the way to the top component
+// to rerender the tabs, so for now I'm refreshing the page which is good enough for me tbh
+panes.push({
+  menuItem : <Menu.Item icon='plus' title='Add a new repo' />,
+  render : () => <AddRepo />
+});
+
+
+
 // Filter out the nulls
 function getPullRequests(pullRequests: (PullRequest | null)[] | null): PullRequest[] {
   const PRs = pullRequests === null ? [] : pullRequests;
-
   return PRs.filter(isNotNull);
 }
 
-function getLatePRs(pullRequests: PullRequest[]) {
 
+
+function getLatePRs(pullRequests: PullRequest[]) {
   const now = moment();
   return pullRequests.filter((pr) => {
     return now.diff(moment(pr.createdAt)) > 3 * 3600 * 24 * 1000;
   });
 
 }
+
+
 
 function getUnassignedPRs(pullRequests: PullRequest[]) {
 
@@ -168,10 +165,14 @@ function getUnassignedPRs(pullRequests: PullRequest[]) {
   });
 }
 
+
+
 function getPRPerUser(pullRequests: PullRequest[]) {
+
+  let initial: PullRequestsPerUser = {};
   
   return pullRequests.reduce(
-    function (acc: prGroups, pr: PullRequest) {
+    function (acc: PullRequestsPerUser, pr: PullRequest) {
 
       const reviewRequests = (pr.reviewRequests === null || pr.reviewRequests.nodes === null ? [] : pr.reviewRequests.nodes).filter(isNotNull);
 
@@ -192,13 +193,6 @@ function getPRPerUser(pullRequests: PullRequest[]) {
 
       return acc;
     }, 
-    {}
+    initial
   );
 }
-
-// Can't be bothered to pass the state change all the way to the top component
-// to rerender the tabs, so for now I'm refreshing the page which is good enough for me tbh
-panes.push({
-    menuItem : <Menu.Item icon='plus' title='Add a new repo' />,
-    render : () => <AddRepo />
-});

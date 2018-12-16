@@ -5,7 +5,7 @@ type PullRequestListProps = {
     pullRequests: PullRequest[]
 };
 
-export default class PullRequestList extends React.Component<PullRequestListProps, {}> {
+export default class PullRequestList extends React.PureComponent<PullRequestListProps, {}> {
   public render() {
     const list = this.props.pullRequests.map(pr => {
       return (
