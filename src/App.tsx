@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Grid, Tab } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 import AppHeader from './AppHeader';
 import Profile from './Profile';
 import 'semantic-ui-css/semantic.min.css';
-import { panes } from './Tabs';
+import { RepoTabs } from './Tabs';
 
 const App = () => {
   return (
@@ -19,7 +19,7 @@ const App = () => {
           <Profile />
         </Grid.Column>
         <Grid.Column width={14}>
-          <Tab panes={panes} />
+          <RepoTabs />
         </Grid.Column>
         </Grid.Row>
       </Grid>

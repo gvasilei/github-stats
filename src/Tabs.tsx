@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as moment from "moment";
-import { Grid, Loader, Card, Message, Menu, Icon, Statistic } from 'semantic-ui-react';
+import { Grid, Loader, Card, Message, Menu, Icon, Statistic, Tab } from 'semantic-ui-react';
 
 import { GET_PULL_REQUESTS } from './queries';
 
@@ -10,6 +10,7 @@ import { Query } from "react-apollo";
 import { getPRs_repository_pullRequests_nodes as PullRequest, getPRs as Repository } from './__generated__/getPRs';
 import AddRepo from './AddRepo';
 import isNotNull from './Utils';
+import { loadState } from './localStorageService';
 
 export type PullRequestsPerUser = {
   [key: string]: {
@@ -19,115 +20,117 @@ export type PullRequestsPerUser = {
   }
 };
 
-// TODO - Create DTOs to handle serialization / desereliazation. Can't be bothered now.
-class RepoQueryVariables {
-  owner: string;
-  name: string;
-}
-
-const getRepoQueryVariables = (): RepoQueryVariables[] => {
-  const reposString = localStorage.getItem('repos');
-  const repoArr = reposString !== null ? reposString.split(',') : [];
-
-  if (repoArr.length === 0 || repoArr.length % 2 !== 0) {
-    return [];
-  }
-
-  let ret: RepoQueryVariables[] = [];
-  for (let i = 0; i < repoArr.length; i += 2) {
-    ret.push({
-      owner: repoArr[i],
-      name: repoArr[i + 1]
-    });
-  }
-
-  return ret;
+export type RepoQueryVariables = {
+  owner: string
+  name: string
 };
 
-const repos = getRepoQueryVariables();
+/*type RepoTabsProps = {
+  panes: Array<{
+    menuItem: JSX.Element
+    render: () => JSX.Element
+  }>
+};*/
 
-
+type RepoTabsState = {
+  repos: RepoQueryVariables[]
+};
 
 class RepoQuery extends Query<Repository, {}> {}
 
 
+export class RepoTabs extends React.Component<{}, RepoTabsState> {
+  constructor(props: {}) {
+    super(props);
+    this.state = { 
+      repos: loadState<RepoQueryVariables[]>() || []
+    };
+  }
 
-export let panes = repos.map((repo: RepoQueryVariables) => {
+  private deleteRepo = (owner: string, name: string) => {
+    console.log(`Implement Delete... ${owner} - ${name}`);
+  }
 
-  return {
-    menuItem : (
-      <Menu.Item name={repo.name} key={`menu-item-${repo.name}`}>
-        {repo.name}
-        <Icon name='delete' size='small' onClick={() => console.log('Implement Delete...')} />
-      </Menu.Item>
-    ), 
-    render: () => {
-      return (
-        <RepoQuery query={GET_PULL_REQUESTS} variables={{owner: repo.owner, repo: repo.name}} pollInterval={30000}>
-        {({ loading, error, data }) => {
-  
-          if (loading) {
-            return <Loader active inline='centered'>Loading...</Loader>;
-          }
-  
-          if (error) {
-            return (
-              <Message negative>
-                <Message.Header>{error.name}</Message.Header>
-                <p>{error.message} {error.extraInfo}</p>
-              </Message>
-            );
-          }
-  
-          if (data === undefined || data.repository === null) {
-            return <p>No Data :(</p>;
-          }
+  // TODO - Check shouldComponentUpdate PureComponent
+  render() {
+    let panes = this.state.repos.map((repo: RepoQueryVariables) => {
 
-          const pullRequests = getPullRequests(data.repository.pullRequests.nodes);
-          const latePRs = getLatePRs(pullRequests);
-          const unassignedPRs = getUnassignedPRs(pullRequests);
-          const prPerUser = getPRPerUser(pullRequests);
-  
+      return {
+        menuItem : (
+          <Menu.Item name={repo.name} key={`menu-item-${repo.name}`}>
+            {repo.name}
+            <Icon name='delete' size='small' onClick={() => this.deleteRepo(repo.owner, repo.name)} />
+          </Menu.Item>
+        ), 
+        render: () => {
           return (
-          <Grid divided='vertically'>
-            <Grid.Row columns={1}>
-              <Grid.Column textAlign="center">
-                <br />
-                <Statistic size='small' label='Open Pull Requests' value={pullRequests.length} />
-              </Grid.Column>
-            </Grid.Row>
-            {Object.keys(prPerUser).length > 0 &&
-            <Grid.Row>
-              <Card.Group>
-                <UserStats prPerUser={prPerUser} />
-              </Card.Group>
-            </Grid.Row>
-            }
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Statistic size='small' label='Late Pull Requests' value={latePRs.length} />
-                <PullRequestList pullRequests={latePRs} />
-              </Grid.Column>
-              <Grid.Column>
-                <Statistic size='small' label='Pull Requests up for grabs' value={unassignedPRs.length} />
-                <PullRequestList pullRequests={unassignedPRs} />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+            <RepoQuery query={GET_PULL_REQUESTS} variables={{owner: repo.owner, repo: repo.name}} pollInterval={30000}>
+            {({ loading, error, data }) => {
+      
+              if (loading) {
+                return <Loader active inline='centered'>Loading...</Loader>;
+              }
+      
+              if (error) {
+                return (
+                  <Message negative>
+                    <Message.Header>{error.name}</Message.Header>
+                    <p>{error.message} {error.extraInfo}</p>
+                  </Message>
+                );
+              }
+      
+              if (data === undefined || data.repository === null) {
+                return <p>No Data :(</p>;
+              }
+    
+              const pullRequests = getPullRequests(data.repository.pullRequests.nodes);
+              const latePRs = getLatePRs(pullRequests);
+              const unassignedPRs = getUnassignedPRs(pullRequests);
+              const prPerUser = getPRPerUser(pullRequests);
+      
+              return (
+              <Grid divided='vertically'>
+                <Grid.Row columns={1}>
+                  <Grid.Column textAlign="center">
+                    <br />
+                    <Statistic size='small' label='Open Pull Requests' value={pullRequests.length} />
+                  </Grid.Column>
+                </Grid.Row>
+                {Object.keys(prPerUser).length > 0 &&
+                <Grid.Row>
+                  <Card.Group>
+                    <UserStats prPerUser={prPerUser} />
+                  </Card.Group>
+                </Grid.Row>
+                }
+                <Grid.Row columns={2}>
+                  <Grid.Column>
+                    <Statistic size='small' label='Late Pull Requests' value={latePRs.length} />
+                    <PullRequestList pullRequests={latePRs} />
+                  </Grid.Column>
+                  <Grid.Column>
+                    <Statistic size='small' label='Pull Requests up for grabs' value={unassignedPRs.length} />
+                    <PullRequestList pullRequests={unassignedPRs} />
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+              );
+            }}
+            </RepoQuery>
           );
-        }}
-        </RepoQuery>
-      );
-    }
-  };
-});
+        }
+      };
+    });
 
-// Can't be bothered to pass the state change all the way to the top component
-// to rerender the tabs, so for now I'm refreshing the page which is good enough for me tbh
-panes.push({
-  menuItem : <Menu.Item icon='plus' title='Add a new repo' />,
-  render : () => <AddRepo />
-});
+    panes.push({
+      menuItem : <Menu.Item icon='plus' title='Add a new repo' />,
+      render : () => <AddRepo />
+    });
+
+    return <Tab panes={panes} />;
+  }
+}
 
 
 

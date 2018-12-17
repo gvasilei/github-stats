@@ -6,6 +6,8 @@ import { Search, SearchResultData } from 'semantic-ui-react';
 import { SEARCH_REPOS } from './queries';
 import { searchRepos, searchRepos_search_nodes_Repository } from './__generated__/searchRepos';
 import isNotNull from './Utils';
+import { RepoQueryVariables } from './Tabs';
+import { loadState, saveState } from './localStorageService';
 
 
 type AddRepoState = {
@@ -55,15 +57,15 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
   handleResultSelect = (e: React.MouseEvent<HTMLElement>, data: SearchResultData) => {
     this.setState({query : data.result.title});
 
-    // TODO - refactor, too error prone
-    const repoToAdd = this.state.results.find((r) => r.name === data.result.title);
-    if (repoToAdd !== undefined) {
-      let repos: string | null = localStorage.getItem('repos');
-      const repoToAddStr = `${repoToAdd.owner.login},${repoToAdd.name}`;
-      if (repos === null) {
-        localStorage.setItem('repos', repoToAddStr);
+    const repo = this.state.results.find((r) => r.name === data.result.title);
+    if (repo !== undefined) {
+      const repos = loadState<RepoQueryVariables[]>();
+      const repoToAdd: RepoQueryVariables = {owner: repo.owner.login, name: repo.name};
+      if (repos === undefined) {
+        saveState<RepoQueryVariables[]>([repoToAdd]);
       } else {
-        localStorage.setItem('repos', repos + "," + repoToAddStr);
+        repos.push(repoToAdd);
+        saveState<RepoQueryVariables[]>(repos);
       }
 
       window.location.reload();
