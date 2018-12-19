@@ -11,6 +11,10 @@ import { DataProxy } from 'apollo-cache';
 import { FetchResult } from 'apollo-link';
 import { REPOSITORY_FRAGMENT } from '../Repository';
 import { STAR_REPOSITORY, UNSTAR_REPOSITORY, UPDATE_SUBSCRIPTION } from './queries';
+import { loadState, saveState } from '../localStorageService';
+import { RepoQueryVariables } from '../Tabs';
+
+
 
 const handleAddStar = (client: DataProxy, mutationResult: FetchResult<{data: addStar}>) => {
   if (mutationResult.data !== undefined) {
@@ -68,7 +72,7 @@ const handleUpdateSubscription = (client: DataProxy, mutationResult: FetchResult
   console.log(mutationResult);
 };
 
-
+// type RepositoryItemProps = getRepos_viewer_repositories_edges_node;
 
 const RepositoryItem = ({
   id,
@@ -84,15 +88,21 @@ const RepositoryItem = ({
 }: getRepos_viewer_repositories_edges_node) => {
 
   const addToStats = (event: React.MouseEvent<HTMLButtonElement>) => {
-    let repos: string | null = localStorage.getItem('repos');
 
-    if (repos === null) {
-      localStorage.setItem('repos', event.currentTarget.value);
-    } else {
-      localStorage.setItem('repos', repos + "," + event.currentTarget.value);
+    const [repoOwner, repoName] = event.currentTarget.value.split(',');
+
+    if (repoName !== undefined) {
+      const repos = loadState<RepoQueryVariables[]>();
+      const repoToAdd: RepoQueryVariables = {owner: repoOwner, name: repoName};
+      if (repos === undefined) {
+        saveState<RepoQueryVariables[]>([repoToAdd]);
+      } else {
+        repos.push(repoToAdd);
+        saveState<RepoQueryVariables[]>(repos);
+      }
+
+      window.location.reload();
     }
-
-    window.location.reload();
   };
 
   const contentDescription = <div dangerouslySetInnerHTML={{ __html: descriptionHTML }} />;

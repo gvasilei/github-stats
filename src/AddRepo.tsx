@@ -54,6 +54,7 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
     this.setState({ input : e.currentTarget.value });
   }
 
+  // TODO - save also repo id
   handleResultSelect = (e: React.MouseEvent<HTMLElement>, data: SearchResultData) => {
     this.setState({query : data.result.title});
 
