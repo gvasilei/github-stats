@@ -1,5 +1,7 @@
 Statistics about open Pull Requests in a repo. Shows the number of later PRs, PRs without a reviewer and the number of participating PRs per user.
 
+![screenshot_1](https://user-images.githubusercontent.com/1075568/50565972-13ed5d80-0d3d-11e9-930c-227bc532441c.png)
+
 In order to use you need to create a Github Personal Access Token with the following permissions:
 
 read:discussion, read:org, read:public_key, read:repo_hook, repo, user
