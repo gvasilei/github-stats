@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as moment from "moment";
+import moment from "moment";
 import { Grid, Loader, Card, Message, Menu, Icon, Statistic, Tab } from 'semantic-ui-react';
 
 import { GET_PULL_REQUESTS } from './queries';

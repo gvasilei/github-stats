@@ -16,7 +16,7 @@ type AddRepoState = {
   loading: boolean
   results: searchRepos_search_nodes_Repository[]
   displayResults: Array<{title: string, description?: string, image?: URL, key: string}>
-  searchTimeout: NodeJS.Timeout | undefined
+  searchTimeout: number | undefined
 };
 
 export default class AddRepo extends React.Component<{}, AddRepoState> {

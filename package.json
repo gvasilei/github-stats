@@ -16,15 +16,15 @@
     "react": "^16.6.1",
     "react-apollo": "^2.2.4",
     "react-dom": "^16.4.1",
-    "react-scripts-ts": "2.16.0",
+    "react-scripts": "^3.0.1",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.0"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "@types/graphql": "^14.0.3",
@@ -34,5 +34,17 @@
     "@types/react-dom": "^16.0.9",
     "dotenv": "^6.2.0",
     "typescript": "^3.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
