@@ -4,7 +4,7 @@ import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { Search, SearchResultData } from 'semantic-ui-react';
 import { SEARCH_REPOS } from './queries';
-import { searchRepos, searchRepos_search_nodes_Repository } from './__generated__/searchRepos';
+import { searchRepos, searchRepos_search_nodes, searchRepos_search_nodes_Repository } from './__generated__/searchRepos';
 import isNotNull from './Utils';
 import { RepoQueryVariables } from './Tabs';
 import { loadState, saveState } from './localStorageService';
@@ -102,7 +102,7 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
     }
     
     const res = data.search.nodes === null ? [] : data.search.nodes;
-    const filteredResults = res.filter(isNotNull);
+    const filteredResults = res.filter(isNotNull).filter((res: searchRepos_search_nodes): res is searchRepos_search_nodes_Repository => true);
 
     this.setState({
       results : filteredResults,
