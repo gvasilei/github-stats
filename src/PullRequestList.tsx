@@ -10,7 +10,7 @@ export default class PullRequestList extends React.PureComponent<PullRequestList
     const list = this.props.pullRequests.map(pr => {
       return (
         <li key={pr.url}>
-          <a href={pr.url} target='_blank'>{`${pr.title}`}</a>
+          <a href={pr.url} target='_blank' rel='noopener noreferrer'>{`${pr.title}`}</a>
         </li>
       );
     });

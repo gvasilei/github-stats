@@ -110,7 +110,7 @@ const RepositoryItem = ({
   <Menu.Item as={Card}>
     <Card.Content>
       <Card.Header>
-        <a href={url} target='_blank'>{name}</a>
+        <a href={url} target='_blank' rel='noopener noreferrer'>{name}</a>
       </Card.Header>
     </Card.Content>
     <Card.Content description={contentDescription} />
