@@ -1,4 +1,4 @@
-const res = require('dotenv').config({ path: '../.env' });
+const res = require('dotenv').config();
 
 module.exports = {
   client: {
