@@ -14,7 +14,7 @@ How to generate the typescript GraphQL Definitions:
 
 * Install [Apollo CLI](https://github.com/apollographql/apollo-tooling).
 
-* Go to the src folder. Then type apollo codegen:generate -c ../apollo.config.js --target=typescript
+* Then type apollo codegen:generate -c ./apollo.config.js --target=typescript
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
