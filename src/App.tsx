@@ -1,38 +1,15 @@
 import * as React from 'react';
-import { Grid, SemanticWIDTHS } from 'semantic-ui-react';
+import { Grid, SemanticWIDTHSNUMBER } from 'semantic-ui-react';
 import AppHeader from './AppHeader';
 import Profile from './Profile';
 import 'semantic-ui-css/semantic.min.css';
 import { RepoTabs } from './Tabs';
-
-const enabledComponents = () => {
-  let apps: String[] | null = null;
-  if (apps !== null) {
-    return apps;
-  }
-
-  apps = [];
-  if (process.env.REACT_APP_ENABLE_MY_REPOS || false) {
-    apps = ["RepoTabs"]
-  }
-  return apps;
-}
-
-const isComponentEnabled = (name: string) => {
-  const components = enabledComponents();
-
-  return components.includes(name);
-}
+import { enabledComponents, isComponentEnabled } from './FeatureFlag';
 
 const App = () => {
 
-  let columnsLength: SemanticWIDTHS;
-
-  if (isComponentEnabled("RepoTabs")) {
-    columnsLength = 2
-  } else {
-    columnsLength = 1
-  }
+  const columnsLength = 1 + enabledComponents().length as SemanticWIDTHSNUMBER
+  const repoTabsLength = 16 - enabledComponents().length * 2 as SemanticWIDTHSNUMBER;
 
   return (
     <div className="App">
@@ -48,7 +25,7 @@ const App = () => {
           <Profile />
         </Grid.Column>
         }
-        <Grid.Column width={14}>
+        <Grid.Column width={repoTabsLength}>
           <RepoTabs />
         </Grid.Column>
         </Grid.Row>
