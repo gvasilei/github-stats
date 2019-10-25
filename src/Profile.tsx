@@ -6,10 +6,9 @@ import { GET_REPOSITORIES_OF_CURRENT_USER } from './queries';
 import { getRepos } from './__generated__/getRepos';
 
 
-class ProfileQuery extends Query<getRepos, {cursor: string | null}> {}
 
 const Profile = () => (
-  <ProfileQuery query={GET_REPOSITORIES_OF_CURRENT_USER} notifyOnNetworkStatusChange={true}>
+  <Query<getRepos, {cursor: string | null}> query={GET_REPOSITORIES_OF_CURRENT_USER} notifyOnNetworkStatusChange={true}>
     {({ data, loading, error, fetchMore }) => {
 
       if (error) {
@@ -36,7 +35,7 @@ const Profile = () => (
         </div>
       );
     }}
-  </ProfileQuery>
+  </Query>
 );
 
 export default Profile;

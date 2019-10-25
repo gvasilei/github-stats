@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Card, Button, Menu } from 'semantic-ui-react';
 import { Mutation } from 'react-apollo';
 
+import { MutationUpdaterFn } from 'apollo-client';
+
 import { getRepos_viewer_repositories_edges_node } from '../__generated__/getRepos';
 import { addStar } from './__generated__/addStar';
 import { removeStar } from './__generated__/removeStar';
@@ -16,8 +18,8 @@ import { RepoQueryVariables } from '../Tabs';
 
 
 
-const handleAddStar = (client: DataProxy, mutationResult: FetchResult<{data: addStar}>) => {
-  if (mutationResult.data !== undefined) {
+const handleAddStar: MutationUpdaterFn<addStar> = (client, mutationResult) => {
+  if (mutationResult.data !== undefined && mutationResult.data !== null && mutationResult.data.addStar !== null && mutationResult.data.addStar.starrable !== null) {
     const repository = client.readFragment<getRepos_viewer_repositories_edges_node>({
       id: `Repository:${mutationResult.data.addStar.starrable.id}`,
       fragment: REPOSITORY_FRAGMENT,
@@ -42,8 +44,9 @@ const handleAddStar = (client: DataProxy, mutationResult: FetchResult<{data: add
   }
 };
 
-const handleRemoveStar = (client: DataProxy, mutationResult: FetchResult<{data: removeStar}>) => {
-  if (mutationResult.data !== undefined) {
+const handleRemoveStar: MutationUpdaterFn<removeStar> = (client, mutationResult) => {
+  if (mutationResult.data !== undefined && mutationResult.data !== null && mutationResult.data.removeStar !== null && mutationResult.data.removeStar.starrable !== null) {
+
     const repository = client.readFragment<getRepos_viewer_repositories_edges_node>({
       id: `Repository:${mutationResult.data.removeStar.starrable.id}`,
       fragment: REPOSITORY_FRAGMENT,
@@ -68,7 +71,7 @@ const handleRemoveStar = (client: DataProxy, mutationResult: FetchResult<{data: 
   }
 };
 
-const handleUpdateSubscription = (client: DataProxy, mutationResult: FetchResult<{data: updateSubscription}>) => {
+const handleUpdateSubscription: MutationUpdaterFn<updateSubscription> = (client, mutationResult) => {
   console.log(mutationResult);
 };
 
@@ -116,7 +119,7 @@ const RepositoryItem = ({
     <Card.Content description={contentDescription} />
     <Card.Content extra>
       {!viewerHasStarred ? (
-      <Mutation mutation={STAR_REPOSITORY} variables={{id}} update={handleAddStar}>
+      <Mutation<addStar> mutation={STAR_REPOSITORY} variables={{id}} update={handleAddStar}>
         {(addStarFn, { data, loading, error}) => (
           <Button
             onClick={(e) => addStarFn()}
@@ -128,7 +131,7 @@ const RepositoryItem = ({
         )}    
       </Mutation>
       ) : (
-      <Mutation mutation={UNSTAR_REPOSITORY} variables={{id}} update={handleRemoveStar}>
+      <Mutation<removeStar> mutation={UNSTAR_REPOSITORY} variables={{id}} update={handleRemoveStar}>
         {(removeStarFn, { data, loading, error}) => (
           <Button 
             onClick={(e) => removeStarFn()}
@@ -144,7 +147,7 @@ const RepositoryItem = ({
       <br/>
       <br/>
       {viewerSubscription === null || viewerSubscription !== SubscriptionState.SUBSCRIBED ? (
-        <Mutation mutation={UPDATE_SUBSCRIPTION} variables={{id: id, state: SubscriptionState.SUBSCRIBED}} update={handleUpdateSubscription}>
+        <Mutation<updateSubscription> mutation={UPDATE_SUBSCRIPTION} variables={{id: id, state: SubscriptionState.SUBSCRIBED}} update={handleUpdateSubscription}>
           {(updateSubscriptionFn, { data, loading, error}) => (
           <Button
             onClick={(e) => updateSubscriptionFn()}
@@ -156,7 +159,7 @@ const RepositoryItem = ({
           )}
         </Mutation>
       ) : (
-        <Mutation mutation={UPDATE_SUBSCRIPTION} variables={{id: id, state: SubscriptionState.UNSUBSCRIBED}} update={handleUpdateSubscription}>
+        <Mutation<updateSubscription> mutation={UPDATE_SUBSCRIPTION} variables={{id: id, state: SubscriptionState.UNSUBSCRIBED}} update={handleUpdateSubscription}>
           {(updateSubscriptionFn, { data, loading, error}) => (
           <Button
             onClick={(e) => updateSubscriptionFn()}

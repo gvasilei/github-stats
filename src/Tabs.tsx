@@ -25,19 +25,9 @@ export type RepoQueryVariables = {
   name: string
 };
 
-/*type RepoTabsProps = {
-  panes: Array<{
-    menuItem: JSX.Element
-    render: () => JSX.Element
-  }>
-};*/
-
 type RepoTabsState = {
   repos: RepoQueryVariables[]
 };
-
-class RepoQuery extends Query<Repository, {}> {}
-
 
 export class RepoTabs extends React.Component<{}, RepoTabsState> {
   constructor(props: {}) {
@@ -64,7 +54,7 @@ export class RepoTabs extends React.Component<{}, RepoTabsState> {
         ), 
         render: () => {
           return (
-            <RepoQuery query={GET_PULL_REQUESTS} variables={{owner: repo.owner, repo: repo.name}} pollInterval={30000}>
+            <Query<Repository, {}> query={GET_PULL_REQUESTS} variables={{owner: repo.owner, repo: repo.name}} pollInterval={30000}>
             {({ loading, error, data }) => {
       
               if (loading) {
@@ -117,7 +107,7 @@ export class RepoTabs extends React.Component<{}, RepoTabsState> {
               </Grid>
               );
             }}
-            </RepoQuery>
+            </Query>
           );
         }
       };
@@ -147,7 +137,6 @@ function getLatePRs(pullRequests: PullRequest[]) {
   return pullRequests.filter((pr) => {
     return now.diff(moment(pr.createdAt)) > 3 * 3600 * 24 * 1000;
   });
-
 }
 
 
