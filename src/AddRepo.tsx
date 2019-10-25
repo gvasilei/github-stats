@@ -73,7 +73,7 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
     }
   }
 
-  handleSearchChange = (client: ApolloClient<InMemoryCache>, query: string | undefined) => {
+  handleSearchChange = (client: ApolloClient<object>, query: string | undefined) => {
 
     if (query === undefined || query === '') {
       this.resetComponent();
@@ -88,7 +88,7 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
     this.setState({ query: query, loading: true, searchTimeout: timeout });
   }
 
-  private doQuery = async (client: ApolloClient<InMemoryCache>, query: string | undefined) => {
+  private doQuery = async (client: ApolloClient<object>, query: string | undefined) => {
     const { data, errors } = await client.query<searchRepos>({
       query: SEARCH_REPOS,
       variables: { repoName: query}
@@ -117,7 +117,7 @@ export default class AddRepo extends React.Component<{}, AddRepoState> {
       <div>
         <br/>
         <ApolloConsumer>
-        {(client) => {
+        {(client: ApolloClient<object>) => {
 
           return (
             <Search 
